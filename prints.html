@@ -1,113 +1,153 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" style="scroll-behavior: smooth;">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prints | eclipse still burns | Photography by RAJU MANDAL</title>
-    <meta name="description" content="Fine art photography prints by Raju Mandal.">
-
-    <!-- Same Tailwind setup as the homepage -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        offblack: '#111111',
-                        purewhite: '#FFFFFF',
-                    },
-                    fontFamily: {
-                        sans: ['Bahnschrift', 'Neue Haas Grotesk', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-                    },
-                    transitionDuration: {
-                        '1500': '1500ms',
-                        '2000': '2000ms',
-                    }
-                }
-            }
+    <style>
+        :root { --offblack: #111111; --paper: #F6F3EC; --font: 'Bahnschrift', 'Neue Haas Grotesk', 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; overflow-x: hidden; height: 100%; }
+        
+        body { background-color: var(--paper); color: var(--offblack); font-family: var(--font); opacity: 0; transition: opacity 0.6s ease; min-height: 100vh; display: flex; flex-direction: column; }
+        body.fade-in { opacity: 1; }
+        
+        body::before {
+            content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.65;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
         }
-    </script>
+        
+        a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; } a:hover { opacity: 0.6; }
+        button { background: none; border: none; cursor: pointer; color: inherit; }
+        .hidden { display: none !important; }
 
-    <link rel="stylesheet" href="css/styles.css">
+        header { position: fixed; top: 0; left: 0; width: 100%; z-index: 50; background: rgba(246, 243, 236, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        @media (min-width: 768px) { header { padding: 1.25rem 3rem; } }
+        
+        .brand { font-size: 1rem; letter-spacing: 0.1em; font-weight: 500; text-transform: lowercase; z-index: 51; }
+        @media (min-width: 768px) { .brand { font-size: 1.25rem; } }
+        
+        .nav-links { display: none; }
+        @media (min-width: 768px) {
+            .nav-links { display: flex; gap: 3rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        }
+        .nav-links a { padding-bottom: 2px; }
+        .nav-links a.active { border-bottom: 1px solid var(--offblack); }
+        
+        .icons { display: flex; gap: 1rem; align-items: center; z-index: 51; }
+        @media (min-width: 768px) { .icons { gap: 1.5rem; } }
+        
+        .menu-btn { display: block; }
+        @media (min-width: 768px) { .menu-btn { display: none; } }
+
+        #mobile-nav { position: fixed; top: 70px; left: 0; width: 100%; background: rgba(246, 243, 236, 0.98); border-bottom: 1px solid rgba(17,17,17,0.1); display: none; flex-direction: column; text-align: center; z-index: 45; }
+        #mobile-nav.open { display: flex; } #mobile-nav a { padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; }
+
+        main { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 8rem 2rem; }
+        .prints-content { text-align: center; }
+        .prints-content h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 400; margin-bottom: 1rem; }
+        .prints-content p { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8; }
+
+        .reveal { opacity: 0; transform: translateY(35px); transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        footer { border-top: 1px solid rgba(17,17,17,0.08); width: 100%; max-width: 1400px; margin: 0 auto; padding: 4rem 1.5rem; }
+        .copyright { display: flex; justify-content: space-between; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; flex-direction: column; align-items: center; gap: 1rem; }
+        @media (min-width: 768px) { footer { padding: 4rem 4rem; } .copyright { flex-direction: row; } }
+    </style>
 </head>
-<body class="font-sans font-light tracking-wide text-offblack bg-purewhite min-h-screen flex flex-col">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="fixed top-0 left-0 w-full bg-purewhite/95 backdrop-blur-md z-50 py-5 px-6 md:px-12 flex justify-between items-center transition-all duration-300" id="navbar">
-        <div class="text-base md:text-xl tracking-widest lowercase font-medium">
-            <a href="index.html" class="hover:opacity-60 transition-opacity">eclipse still burns</a>
-        </div>
-
-        <nav class="hidden md:flex space-x-12 text-xs uppercase tracking-[0.2em]">
-            <a href="work.html" class="hover:text-gray-400 transition-colors duration-300">Work</a>
-            <a href="prints.html" aria-current="page" class="border-b border-offblack pb-1">Prints</a>
-            <a href="index.html#about" class="hover:text-gray-400 transition-colors duration-300">About</a>
+    <header>
+        <div class="brand"><a href="index.html">eclipse still burns</a></div>
+        <nav class="nav-links">
+            <a href="work.html">Album</a>
+            <a href="prints.html" class="active">Prints</a>
+            <a href="index.html#about">About</a>
         </nav>
-
-        <div class="flex space-x-4 md:space-x-6 items-center">
-            <a href="https://instagram.com/eclipsestillburns/" target="_blank" aria-label="Instagram" class="hover:opacity-50 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="icons">
+            <a href="https://instagram.com/eclipsestillburns/" target="_blank" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                 </svg>
             </a>
-            <a href="mailto:rjmdl.slg@gmail.com" aria-label="Email" class="hover:opacity-50 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <a href="mailto:rjmdl.slg@gmail.com" aria-label="Email">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                     <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
             </a>
-            <!-- Menu button (phones only) -->
-            <button id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden hover:opacity-50 transition-opacity">
-                <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <button id="menu-btn" class="menu-btn" aria-label="Menu">
+                <svg id="icon-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="8" x2="21" y2="8"></line>
                     <line x1="3" y1="16" x2="21" y2="16"></line>
                 </svg>
-                <svg id="icon-close" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="5" x2="19" y2="19"></line>
                     <line x1="19" y1="5" x2="5" y2="19"></line>
                 </svg>
             </button>
         </div>
-
-        <!-- Mobile menu (phones only) -->
-        <nav id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-purewhite/95 backdrop-blur-md px-6 pt-2 pb-6 text-xs uppercase tracking-[0.2em]">
-            <a href="work.html" class="block py-3 hover:text-gray-400 transition-colors duration-300">Work</a>
-            <a href="prints.html" aria-current="page" class="block py-3">Prints</a>
-            <a href="index.html#about" class="block py-3 hover:text-gray-400 transition-colors duration-300">About</a>
-        </nav>
     </header>
 
-    <main class="flex-grow pt-32 px-6 md:px-12 pb-32 flex items-center justify-center">
-        <section id="prints" class="text-center reveal active">
-            <h1 class="text-xl md:text-4xl leading-relaxed md:leading-loose font-normal uppercase tracking-[0.2em] mb-6">Prints</h1>
-            <p class="text-sm md:text-base text-black font-normal tracking-widest uppercase">Coming soon</p>
-        </section>
+    <nav id="mobile-nav">
+        <a href="work.html">Album</a>
+        <a href="prints.html">Prints</a>
+        <a href="index.html#about">About</a>
+    </nav>
+
+    <main>
+        <div class="prints-content reveal">
+            <h1>Prints</h1>
+            <p>Coming soon</p>
+        </div>
     </main>
 
-    <footer class="px-6 md:px-12 py-12 border-t border-gray-100 bg-purewhite">
-        <div class="max-w-7xl mx-auto text-center md:text-left text-xs text-gray-400 tracking-widest uppercase flex flex-col md:flex-row justify-between items-center">
+    <footer>
+        <div class="copyright">
             <p>&copy; 2026 Raju Mandal. All rights reserved.</p>
-            <p class="mt-4 md:mt-0 lowercase">eclipse still burns</p>
+            <p style="text-transform: lowercase;">eclipse still burns</p>
         </div>
     </footer>
 
-    <!-- Phone menu toggle -->
     <script>
-        (function () {
-            var btn = document.getElementById('menu-btn'), menu = document.getElementById('mobile-menu');
-            if (!btn || !menu) return;
-            function set(open) {
-                menu.classList.toggle('hidden', !open);
-                btn.setAttribute('aria-expanded', open);
-                document.getElementById('icon-menu').classList.toggle('hidden', open);
-                document.getElementById('icon-close').classList.toggle('hidden', !open);
-            }
-            btn.addEventListener('click', function () { set(menu.classList.contains('hidden')); });
-            menu.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
-        })();
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => document.body.classList.add('fade-in'), 50);
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', e => {
+                const href = link.getAttribute('href');
+                if(href && !href.startsWith('#') && !href.startsWith('mailto') && link.target !== '_blank') {
+                    e.preventDefault();
+                    document.body.classList.remove('fade-in');
+                    setTimeout(() => window.location = href, 450);
+                }
+            });
+        });
 
+        const menuBtn = document.getElementById('menu-btn'), mobileNav = document.getElementById('mobile-nav');
+        const iconMenu = document.getElementById('icon-menu'), iconClose = document.getElementById('icon-close');
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const isOpen = mobileNav.classList.contains('open');
+                if (isOpen) {
+                    mobileNav.classList.remove('open');
+                    iconMenu.classList.remove('hidden');
+                    iconClose.classList.add('hidden');
+                } else {
+                    mobileNav.classList.add('open');
+                    iconMenu.classList.add('hidden');
+                    iconClose.classList.remove('hidden');
+                }
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('active'); observer.unobserve(e.target); } });
+        }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    });
+    </script>
 </body>
 </html>

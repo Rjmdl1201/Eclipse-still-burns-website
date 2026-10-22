@@ -1,359 +1,399 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" style="scroll-behavior: smooth;">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eclipse still burns | Photography by RAJU MANDAL</title>
     <meta name="description" content="A minimalist, high-end editorial photography portfolio featuring the works of Raju Mandal.">
-    
-    <!-- Tailwind CSS for rapid layout and utility classes -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Configuration for Tailwind to enforce exact color palette and fonts -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        offblack: '#111111',
-                        purewhite: '#FFFFFF',
-                    },
-                    fontFamily: {
-                        sans: ['Bahnschrift', 'Neue Haas Grotesk', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-                    },
-                    transitionDuration: {
-                        '1500': '1500ms',
-                        '2000': '2000ms',
-                    }
-                }
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --offblack: #111111;
+            --paper: #F6F3EC; 
+            --font: 'Bahnschrift', 'Neue Haas Grotesk', 'Segoe UI', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
+        /* --- ENHANCED PAPER GRAIN BACKGROUND --- */
+        body {
+            background-color: var(--paper);
+            color: var(--offblack);
+            font-family: var(--font);
+            opacity: 0;
+            transition: opacity 0.6s ease; 
+        }
+        body.fade-in { opacity: 1; }
+        
+        /* Richer analog noise overlay */
+        body::before {
+            content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.65;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+        }
+
+        a { text-decoration: none; color: inherit; transition: opacity 0.3s ease; }
+        a:hover { opacity: 0.6; }
+        button { background: none; border: none; cursor: pointer; color: inherit; }
+        img { display: block; width: 100%; height: auto; }
+        .hidden { display: none !important; }
+
+        /* --- HEADER NAVIGATION (FLEXBOX RESTORED) --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
+            background: rgba(246, 243, 236, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        @media (min-width: 768px) {
+            header { padding: 1.25rem 3rem; }
+        }
+        
+        .brand { font-size: 1rem; letter-spacing: 0.1em; font-weight: 500; text-transform: lowercase; z-index: 51; }
+        @media (min-width: 768px) { .brand { font-size: 1.25rem; } }
+        
+        /* Hidden on mobile, Absolute True Center on Desktop */
+        .nav-links { display: none; }
+        @media (min-width: 768px) {
+            .nav-links { 
+                display: flex; gap: 3rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; 
+                position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
             }
         }
-    </script>
+        .nav-links a { padding-bottom: 2px; }
+        .nav-links a.active { border-bottom: 1px solid var(--offblack); }
+        
+        .icons { display: flex; gap: 1rem; align-items: center; z-index: 51; }
+        @media (min-width: 768px) { .icons { gap: 1.5rem; } }
+        
+        .menu-btn { display: block; }
+        @media (min-width: 768px) { .menu-btn { display: none; } }
 
-    <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- Inline styles to hide scrollbar for the single-line quote -->
-    <style>
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        #mobile-nav {
+            position: fixed; top: 70px; left: 0; width: 100%; background: rgba(246, 243, 236, 0.98);
+            border-bottom: 1px solid rgba(17,17,17,0.1); display: none; flex-direction: column; text-align: center; z-index: 45;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        #mobile-nav.open { display: flex; }
+        #mobile-nav a { padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; }
+
+        /* --- HERO CROSSFADE --- */
+        main { padding-top: 8rem; }
+        .hero { max-width: 800px; padding: 0 1.5rem; margin: 2rem auto 6rem; }
+        .hero p { display: block; margin-bottom: 1.5rem; line-height: 1.7; font-size: 0.9rem; opacity: 0; transform: translateY(15px); transition: all 1.8s cubic-bezier(0.2, 1, 0.3, 1); }
+        .hero.visible p { opacity: 1; transform: translateY(0); }
+        .hero.visible p:nth-child(2) { transition-delay: 0.5s; }
+        .hero.visible p:nth-child(3) { transition-delay: 1.0s; }
+        .hero.visible p:nth-child(4) { transition-delay: 1.5s; }
+        @media (min-width: 768px) { .hero { padding: 0 3rem; margin-bottom: 8rem; } .hero p { font-size: 1rem; } }
+
+        /* --- SCALED-UP ASYMMETRICAL GRID --- */
+        .gallery { 
+            max-width: 1700px; width: 100%;
+            margin: 0 auto; padding: 0 1.5rem 6rem; display: grid; grid-template-columns: 1fr; gap: 6rem; 
         }
+        @media (min-width: 768px) {
+            .gallery { padding: 0 4rem 10rem; grid-template-columns: repeat(12, 1fr); gap: 12rem 3rem; }
+            .col-4 { grid-column: span 4 / span 4; } .col-5 { grid-column: span 5 / span 5; } .col-6 { grid-column: span 6 / span 6; } .col-7 { grid-column: span 7 / span 7; } .col-8 { grid-column: span 8 / span 8; } .col-10 { grid-column: span 10 / span 10; } .col-12 { grid-column: span 12 / span 12; }
+            .start-1 { grid-column-start: 1; } .start-2 { grid-column-start: 2; } .start-3 { grid-column-start: 3; } .start-4 { grid-column-start: 4; } .start-5 { grid-column-start: 5; } .start-7 { grid-column-start: 7; } .start-8 { grid-column-start: 8; } .start-9 { grid-column-start: 9; }
+            .mt-up { margin-top: -10rem; } .mt-down { margin-top: 10rem; }
+        }
+
+        /* --- IMAGES & EFFECTS --- */
+        .gallery-item { position: relative; will-change: transform; width: 100%; display: block; }
+        
+        .reveal { opacity: 0; transform: translateY(35px); transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        .img-wrap { position: relative; overflow: hidden; background: #e9e5dc; cursor: pointer; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.12); width: 100%; display: block; }
+        
+        /* Subtle image-level film grain */
+        .img-wrap::after {
+            content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; opacity: 0.12;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+        }
+        
+        .img-wrap img { transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1); width: 100%; height: auto; display: block; }
+        
+        @media (hover: hover) and (pointer: fine) {
+            .gallery-item:hover .img-wrap img { transform: scale(1.035); }
+        }
+
+        /* --- CAPTIONS --- */
+        figcaption {
+            margin-top: 0.5rem; font-size: 0.9rem; font-weight: 400; text-align: left; 
+        }
+        @media (hover: hover) and (pointer: fine) {
+            figcaption { opacity: 0; transform: translateY(-6px); transition: all 0.4s ease; }
+            .gallery-item:hover figcaption { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- ABOUT & FOOTER --- */
+        footer { border-top: 1px solid rgba(17,17,17,0.08); max-width: 1700px; margin: 0 auto; padding: 4rem 1.5rem; }
+        .footer-grid { display: grid; grid-template-columns: 1fr; gap: 3rem; margin-bottom: 4rem; }
+        @media (min-width: 768px) { 
+            footer { padding: 6rem 4rem 4rem; }
+            .footer-grid { grid-template-columns: 4fr 5fr 3fr; gap: 4rem; margin-bottom: 6rem; } 
+            .contact { text-align: right; } 
+        }
+        .footer-bio h2 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 400; margin-bottom: 1.5rem; }
+        .footer-bio p { margin-bottom: 1rem; line-height: 1.7; }
+        .contact-group { margin-bottom: 2rem; font-size: 0.9rem; }
+        .contact-group h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 400; margin-bottom: 0.5rem; opacity: 0.6; }
+        .copyright { display: flex; justify-content: space-between; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; border-top: 1px solid rgba(17,17,17,0.08); padding-top: 2rem; flex-direction: column; align-items: center; gap: 1rem; }
+        @media (min-width: 768px) { .copyright { flex-direction: row; } }
+
+        /* --- DARK LIGHTBOX --- */
+        #lightbox { position: fixed; inset: 0; background: rgba(10,10,10,0.96); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(5px); }
+        #lightbox.open { opacity: 1; pointer-events: auto; }
+        #lb-img { max-width: 90vw; max-height: 80vh; object-fit: contain; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transform: scale(0.96); transition: transform 0.4s ease; }
+        #lightbox.open #lb-img { transform: scale(1); }
+        .lb-btn { position: absolute; color: #fff; opacity: 0.5; padding: 1rem; transition: opacity 0.3s; }
+        .lb-btn:hover { opacity: 1; }
+        #lb-close { top: 1rem; right: 1rem; }
+        #lb-prev { left: 1rem; top: 50%; transform: translateY(-50%); }
+        #lb-next { right: 1rem; top: 50%; transform: translateY(-50%); }
     </style>
 </head>
-<body class="font-sans font-light tracking-wide text-offblack bg-purewhite min-h-screen flex flex-col">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="fixed top-0 left-0 w-full bg-purewhite/95 backdrop-blur-md z-50 py-5 px-6 md:px-12 flex justify-between items-center transition-all duration-300" id="navbar">
-        <!-- Top-Left: Brand -->
-        <div class="text-base md:text-xl tracking-widest lowercase font-medium">
-            <a href="#" class="hover:opacity-60 transition-opacity">eclipse still burns</a>
-        </div>
-
-        <!-- Center: Navigation -->
-        <nav class="hidden md:flex space-x-12 text-xs uppercase tracking-[0.2em]">
-            <a href="work.html" class="hover:text-gray-400 transition-colors duration-300">Work</a>
-            <a href="prints.html" class="hover:text-gray-400 transition-colors duration-300">Prints</a>
-            <a href="#about" class="hover:text-gray-400 transition-colors duration-300">About</a>
+    <header>
+        <div class="brand"><a href="index.html">eclipse still burns</a></div>
+        <nav class="nav-links">
+            <a href="work.html">Work</a>
+            <a href="prints.html">Prints</a>
+            <a href="#about">About</a>
         </nav>
-
-        <!-- Top-Right: Icons -->
-        <div class="flex space-x-4 md:space-x-6 items-center">
-            <!-- Instagram Icon -->
-            <a href="https://instagram.com/eclipsestillburns/" target="_blank" aria-label="Instagram" class="hover:opacity-50 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="icons">
+            <a href="https://instagram.com/eclipsestillburns/" target="_blank" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                 </svg>
             </a>
-            <!-- Gmail Icon -->
-            <a href="mailto:rjmdl.slg@gmail.com" aria-label="Email" class="hover:opacity-50 transition-opacity">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <a href="mailto:rjmdl.slg@gmail.com" aria-label="Email">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                     <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
             </a>
-            <!-- Menu button (phones only) -->
-            <button id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden hover:opacity-50 transition-opacity">
-                <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <button id="menu-btn" class="menu-btn" aria-label="Menu">
+                <svg id="icon-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="8" x2="21" y2="8"></line>
                     <line x1="3" y1="16" x2="21" y2="16"></line>
                 </svg>
-                <svg id="icon-close" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg id="icon-close" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="5" x2="19" y2="19"></line>
                     <line x1="19" y1="5" x2="5" y2="19"></line>
                 </svg>
             </button>
         </div>
-
-        <!-- Mobile menu (phones only) -->
-        <nav id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-purewhite/95 backdrop-blur-md px-6 pt-2 pb-6 text-xs uppercase tracking-[0.2em]">
-            <a href="work.html" class="block py-3 hover:text-gray-400 transition-colors duration-300">Work</a>
-            <a href="prints.html" class="block py-3 hover:text-gray-400 transition-colors duration-300">Prints</a>
-            <a href="#about" class="block py-3 hover:text-gray-400 transition-colors duration-300">About</a>
-        </nav>
     </header>
 
-    <main class="flex-grow pt-32">
-        <!-- Hero Section -->
-        <section id="hero" class="px-6 md:px-12 w-full text-left mt-12 mb-32 reveal active overflow-x-auto no-scrollbar">
-            <!-- Slightly increased font size (text-sm md:text-base) with preserved stanza spacing -->
-            <h1 class="text-sm md:text-base leading-relaxed font-normal text-offblack space-y-5">
-                <span class="block">
-                    <span class="block">Not for anyone. Not for anything.</span>
-                    <span class="block">Not for reward, not even to be found.</span>
-                    <span class="block">Me and my thoughts, quiet and unhurried.</span>
-                </span>
-                <span class="block">
-                    <span class="block">My photographs are small mirrors I leave lying around:</span>
-                    <span class="block">My thoughts, my character, my unspoken desires.</span>
-                    <span class="block">This is who I am, and who I’m walking toward.</span>
-                    <span class="block">The change I see, the change I want to be.</span>
-                </span>
-                <span class="block">
-                    <span class="block">No message. No story.</span>
-                    <span class="block">No rules, no culture, no tradition.</span>
-                    <span class="block">No one has to force me, not even myself.</span>
-                </span>
-                <span class="block">
-                    <span class="block">Untethered, in the light.</span>
-                </span>
-            </h1>
+    <nav id="mobile-nav">
+        <a href="work.html">Work</a>
+        <a href="prints.html">Prints</a>
+        <a href="#about">About</a>
+    </nav>
+
+    <main>
+        <section id="hero" class="hero">
+            <p>Not for anyone. Not for anything.<br>Not for reward, not even to be found.<br>Me and my thoughts, quiet and unhurried.</p>
+            <p>My photographs are small mirrors I leave lying around:<br>My thoughts, my character, my unspoken desires.<br>This is who I am, and who I’m walking toward.<br>The change I see, the change I want to be.</p>
+            <p>No message. No story.<br>No rules, no culture, no tradition.<br>No one has to force me, not even myself.</p>
+            <p>Untethered, in the light.</p>
         </section>
 
-        <!-- Work Section -->
-        <section id="work" class="px-6 md:px-12 pb-32">
+        <section class="gallery">
+            <!-- YOKED -->
+            <figure class="gallery-item reveal col-8 start-3">
+                <div class="img-wrap"><img src="images/1.jpg" alt="Seas"></div>
+                <figcaption>Seas</figcaption>
+            </figure>
+            <figure class="gallery-item reveal col-5 start-1">
+                <div class="img-wrap"><img src="images/2.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-5 start-8">
+                <div class="img-wrap"><img src="images/3.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-10 start-2">
+                <div class="img-wrap"><img src="images/4.jpg" alt="Photograph"></div>
+            </figure>
 
-            <!-- Asymmetrical CSS Grid Gallery -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-y-32 md:gap-x-8" id="gallery-container">
+            <!-- LOUISA -->
+            <figure class="gallery-item reveal col-6 start-7">
+                <div class="img-wrap"><img src="images/5.jpg" alt="Embed"></div>
+                <figcaption>Embed</figcaption>
+            </figure>
+            <figure class="gallery-item reveal col-5 start-1 mt-up">
+                <div class="img-wrap"><img src="images/6.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-8 start-3">
+                <div class="img-wrap"><img src="images/7.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-4 start-5">
+                <div class="img-wrap"><img src="images/8.jpg" alt="Photograph"></div>
+            </figure>
 
-                <!-- SERIES: YOKED (4 images) -->
-                <figure class="gallery-item reveal col-span-1 md:col-span-8 md:col-start-3" data-series="yoked">
-                    <div class="gallery-img-container">
-                        <img src="images/1.jpg" alt="Yoked Series Image 1" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 01 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">[ Seas ]</span>
-                    </figcaption>
-                </figure>
+            <!-- RED ZONE -->
+            <figure class="gallery-item reveal col-12 start-1">
+                <div class="img-wrap"><img src="images/9.jpg" alt="Still Water"></div>
+                <figcaption>Still Water</figcaption>
+            </figure>
+            <figure class="gallery-item reveal col-5 start-2">
+                <div class="img-wrap"><img src="images/10.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-4 start-8 mt-down">
+                <div class="img-wrap"><img src="images/11.jpg" alt="Photograph"></div>
+            </figure>
 
-                <figure class="gallery-item reveal col-span-1 md:col-span-5 md:col-start-1" data-series="yoked">
-                    <div class="gallery-img-container">
-                        <img src="images/2.jpg" alt="Yoked Series Image 2" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 02 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-5 md:col-start-8 mt-0" data-series="yoked">
-                    <div class="gallery-img-container">
-                        <img src="images/3.jpg" alt="Yoked Series Image 3" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 03 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-10 md:col-start-2" data-series="yoked">
-                    <div class="gallery-img-container">
-                        <img src="images/4.jpg" alt="Yoked Series Image 4" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 04 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <!-- SERIES: LOUISA (4 images) -->
-                <figure class="gallery-item reveal col-span-1 md:col-span-6 md:col-start-7" data-series="louisa">
-                    <div class="gallery-img-container">
-                        <img src="images/5.jpg" alt="Louisa Series Image 5" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 05 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">[ Embed ]</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-5 md:col-start-1 mt-0 md:-mt-64" data-series="louisa">
-                    <div class="gallery-img-container">
-                        <img src="images/6.jpg" alt="Louisa Series Image 6" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 06 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-8 md:col-start-3" data-series="louisa">
-                    <div class="gallery-img-container">
-                        <img src="images/7.jpg" alt="Louisa Series Image 7" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 07 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-                
-                <figure class="gallery-item reveal col-span-1 md:col-span-4 md:col-start-5" data-series="louisa">
-                    <div class="gallery-img-container">
-                        <img src="images/8.jpg" alt="Louisa Series Image 8" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 08 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <!-- SERIES: RED ZONE (3 images) -->
-                <figure class="gallery-item reveal col-span-1 md:col-span-12 md:col-start-1" data-series="redzone">
-                    <div class="gallery-img-container">
-                        <img src="images/9.jpg" alt="Red Zone Series Image 9" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 09 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">[ Still Water ]</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-5 md:col-start-2" data-series="redzone">
-                    <div class="gallery-img-container">
-                        <img src="images/10.jpg" alt="Red Zone Series Image 10" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 10 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-4 md:col-start-8 mt-0 md:mt-32" data-series="redzone">
-                    <div class="gallery-img-container">
-                        <img src="images/11.jpg" alt="Red Zone Series Image 11" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 11 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <!-- SERIES: SALTWATER (4 images) -->
-                <figure class="gallery-item reveal col-span-1 md:col-span-7 md:col-start-4" data-series="saltwater">
-                    <div class="gallery-img-container">
-                        <img src="images/12.jpg" alt="Saltwater Series Image 12" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 12 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-5 md:col-start-1" data-series="saltwater">
-                    <div class="gallery-img-container">
-                        <img src="images/13.jpg" alt="Saltwater Series Image 13" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 13 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-4 md:col-start-9 mt-0 md:-mt-24" data-series="saltwater">
-                    <div class="gallery-img-container">
-                        <img src="images/14.jpg" alt="Saltwater Series Image 14" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 14 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">... text here ...</span>
-                    </figcaption>
-                </figure>
-
-                <figure class="gallery-item reveal col-span-1 md:col-span-8 md:col-start-3" data-series="saltwater">
-                    <div class="gallery-img-container">
-                        <img src="images/15.jpg" alt="Saltwater Series Image 15" loading="lazy" class="w-full h-auto object-contain">
-                    </div>
-                    <figcaption class="mt-6 text-sm uppercase tracking-widest text-black font-normal flex flex-col md:flex-row justify-between">
-                        <span>[ Image 15 ]</span>
-                        <span class="text-black font-normal normal-case mt-2 md:mt-0 tracking-normal text-base">[ Darjeeling, 2019 ]</span>
-                    </figcaption>
-                </figure>
-
-            </div>
+            <!-- SALTWATER -->
+            <figure class="gallery-item reveal col-7 start-4">
+                <div class="img-wrap"><img src="images/12.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-5 start-1">
+                <div class="img-wrap"><img src="images/13.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-4 start-9 mt-up">
+                <div class="img-wrap"><img src="images/14.jpg" alt="Photograph"></div>
+            </figure>
+            <figure class="gallery-item reveal col-8 start-3">
+                <div class="img-wrap"><img src="images/15.jpg" alt="Darjeeling 2019"></div>
+                <figcaption>Darjeeling, 2019</figcaption>
+            </figure>
         </section>
-
     </main>
 
-    <!-- About Section & Footer -->
-    <footer id="about" class="px-6 md:px-12 py-24 md:py-32 border-t border-gray-100 bg-purewhite reveal">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8 items-start">
-            
-            <!-- Left: New Image Section (Image 16) -->
-            <div class="col-span-1 md:col-span-4">
-                <img src="images/16.jpg" alt="Raju Mandal Portrait" loading="lazy" class="w-full h-auto object-cover">
+    <footer id="about" class="reveal">
+        <div class="footer-grid">
+            <div class="about-img">
+                <div class="img-wrap"><img src="images/16.jpg" alt="Raju Mandal"></div>
             </div>
-
-            <!-- Middle: Artist Bio -->
-            <div class="col-span-1 md:col-span-5 space-y-8 md:px-8">
-                <h2 class="text-lg md:text-xl font-medium uppercase tracking-[0.15em]">Raju Mandal</h2>
-                <div class="text-sm md:text-base leading-relaxed text-gray-600 space-y-4">
-                    <p>
-                        A visual artist dedicated to the exploration of negative space, fleeting light, and quiet tension. The philosophy of the studio is rooted in curated restraint—allowing the absence of visual noise to amplify the emotional gravity of the subject.
-                    </p>
-                    <p>
-                        Through asymmetrical composition and paced visual storytelling, each photograph becomes an invitation to pause, reflect, and find the subtle fires burning within the dark.
-                    </p>
-                </div>
+            <div class="footer-bio">
+                <h2>Raju Mandal</h2>
+                <p>A visual artist dedicated to the exploration of negative space, fleeting light, and quiet tension. The philosophy of the studio is rooted in curated restraint—allowing the absence of visual noise to amplify the emotional gravity of the subject.</p>
+                <p>Through asymmetrical composition and paced visual storytelling, each photograph becomes an invitation to pause, reflect, and find the subtle fires burning within the dark.</p>
             </div>
-
-            <!-- Right: Contact & Details -->
-            <div class="col-span-1 md:col-span-3 flex flex-col md:items-end space-y-12">
-                
-                <div class="space-y-4 text-left md:text-right text-sm">
-                    <h3 class="uppercase tracking-widest text-gray-400 mb-6 text-xs">Inquiries & Prints</h3>
-                    <a href="mailto:rjmdl.slg@gmail.com" class="block hover:opacity-60 transition-opacity">rjmdl.slg@gmail.com</a>
-                    <a href="https://instagram.com/eclipsestillburns/" target="_blank" class="block hover:opacity-60 transition-opacity">@eclipsestillburns</a>
+            <div class="contact">
+                <div class="contact-group">
+                    <h3>Inquiries & Prints</h3>
+                    <a href="mailto:rjmdl.slg@gmail.com">rjmdl.slg@gmail.com</a><br>
+                    <a href="https://instagram.com/eclipsestillburns/" target="_blank">@eclipsestillburns</a>
                 </div>
-
-                <div class="space-y-2 text-left md:text-right text-sm text-gray-500">
-                    <p>Studio based in</p>
-                    <p class="text-offblack">Siliguri, West Bengal, India</p>
+                <div class="contact-group">
+                    <h3>Studio based in</h3>
+                    <p>Siliguri, West Bengal, India</p>
                 </div>
-
             </div>
         </div>
-
-        <!-- Subtle Footer Sign-off -->
-        <div class="max-w-7xl mx-auto mt-32 text-center md:text-left text-xs text-gray-400 tracking-widest uppercase flex flex-col md:flex-row justify-between items-center">
+        <div class="copyright">
             <p>&copy; 2026 Raju Mandal. All rights reserved.</p>
-            <p class="mt-4 md:mt-0 lowercase">eclipse still burns</p>
+            <p style="text-transform: lowercase;">eclipse still burns</p>
         </div>
     </footer>
 
-    <!-- Link to external JavaScript file -->
-    <script src="js/main.js"></script>
+    <!-- LIGHTBOX -->
+    <div id="lightbox">
+        <button id="lb-close" class="lb-btn" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <button id="lb-prev" class="lb-btn" aria-label="Previous"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+        <img id="lb-img" src="" alt="">
+        <button id="lb-next" class="lb-btn" aria-label="Next"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    </div>
 
-    <!-- Phone menu toggle -->
     <script>
-        (function () {
-            var btn = document.getElementById('menu-btn'), menu = document.getElementById('mobile-menu');
-            if (!btn || !menu) return;
-            function set(open) {
-                menu.classList.toggle('hidden', !open);
-                btn.setAttribute('aria-expanded', open);
-                document.getElementById('icon-menu').classList.toggle('hidden', open);
-                document.getElementById('icon-close').classList.toggle('hidden', !open);
-            }
-            btn.addEventListener('click', function () { set(menu.classList.contains('hidden')); });
-            menu.addEventListener('click', function (e) { if (e.target.closest('a')) set(false); });
-        })();
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Page Fade Transition
+        setTimeout(() => document.body.classList.add('fade-in'), 50);
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', e => {
+                const href = link.getAttribute('href');
+                if(href && !href.startsWith('#') && !href.startsWith('mailto') && link.target !== '_blank') {
+                    e.preventDefault();
+                    document.body.classList.remove('fade-in');
+                    setTimeout(() => window.location = href, 450);
+                }
+            });
+        });
 
+        // Slow Hero Crossfade
+        const hero = document.getElementById('hero');
+        if(hero) setTimeout(() => hero.classList.add('visible'), 150);
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-btn'), mobileNav = document.getElementById('mobile-nav');
+        const iconMenu = document.getElementById('icon-menu'), iconClose = document.getElementById('icon-close');
+        if(menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const isOpen = mobileNav.classList.contains('open');
+                if (isOpen) {
+                    mobileNav.classList.remove('open');
+                    iconMenu.classList.remove('hidden');
+                    iconClose.classList.add('hidden');
+                } else {
+                    mobileNav.classList.add('open');
+                    iconMenu.classList.add('hidden');
+                    iconClose.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Fade-and-Rise Effect
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if(e.isIntersecting) { e.target.classList.add('active'); observer.unobserve(e.target); }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Soft Parallax Effect
+        const items = document.querySelectorAll('.gallery-item');
+        window.addEventListener('scroll', () => {
+            if(window.innerWidth > 768) {
+                items.forEach(item => {
+                    const rect = item.getBoundingClientRect();
+                    if(rect.top < window.innerHeight && rect.bottom > 0) {
+                        item.style.transform = `translateY(${(rect.top - window.innerHeight/2) * 0.05}px)`;
+                    }
+                });
+            }
+        }, { passive: true });
+
+        // Dark Lightbox & Navigation
+        const lb = document.getElementById('lightbox'), lbImg = document.getElementById('lb-img');
+        const images = Array.from(document.querySelectorAll('.img-wrap img'));
+        let curIdx = 0;
+        
+        images.forEach((img, idx) => {
+            img.parentElement.addEventListener('click', () => {
+                curIdx = idx; lbImg.src = img.src; lb.classList.add('open');
+            });
+        });
+        
+        const closeLb = () => lb.classList.remove('open');
+        const navLb = (dir) => {
+            curIdx = (curIdx + dir + images.length) % images.length;
+            lbImg.style.opacity = 0;
+            setTimeout(() => { lbImg.src = images[curIdx].src; lbImg.style.opacity = 1; }, 250);
+        };
+        
+        document.getElementById('lb-close').addEventListener('click', closeLb);
+        document.getElementById('lb-prev').addEventListener('click', (e) => { e.stopPropagation(); navLb(-1); });
+        document.getElementById('lb-next').addEventListener('click', (e) => { e.stopPropagation(); navLb(1); });
+        lb.addEventListener('click', e => { if(e.target === lb) closeLb(); });
+        
+        document.addEventListener('keydown', e => {
+            if(!lb.classList.contains('open')) return;
+            if(e.key === 'Escape') closeLb();
+            if(e.key === 'ArrowLeft') navLb(-1);
+            if(e.key === 'ArrowRight') navLb(1);
+        });
+
+        let touchX = 0;
+        lb.addEventListener('touchstart', e => touchX = e.changedTouches[0].screenX, {passive: true});
+        lb.addEventListener('touchend', e => {
+            let dX = e.changedTouches[0].screenX - touchX;
+            if(dX > 50) navLb(-1);
+            if(dX < -50) navLb(1);
+        }, {passive: true});
+    });
+    </script>
 </body>
 </html>
